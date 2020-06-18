@@ -5,4 +5,19 @@
     <dimen name="nav_header_vertical_spacing">8dp</dimen>
     <dimen name="nav_header_height">176dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="app_bar_height">180dp</dimen>
+
+    <!--post-->
+    <dimen name="text_margin">16dp</dimen>
+    <dimen name="text_padding">10dp</dimen>
+    <dimen name="spinner_width">96dp</dimen>
+    <dimen name="special_edit_text_width">96dp</dimen>
+    <dimen name="post_widget_bottom_margin">20dp</dimen>
+
+    <!--text sizes-->
+    <dimen name="small_text">14sp</dimen>
+    <dimen name="medium_text">18sp</dimen>
+    <dimen name="large_text">22sp</dimen>
+
+
 </resources>
