@@ -21,7 +21,34 @@
 
 
     <string name="save_btn">Save</string>
+    <string name="edit_btn">Edit</string>
+    <string name="cancel_btn">Cancel</string>
+    <string name="exit_btn">Exit</string>
+    <string name="post_btn">Post</string>
 
 
     <string name="placeholdertext">Place holder text.</string>
+
+
+    <string name="post_app_title">Create a Post</string>
+    <string name="title_activity_post">PostActivity</string>
+    <string name="post_food_title_label">Food title</string>
+    <string-array name="buildings_array">
+        <item>C-Building</item>
+        <item>L-Building</item>
+        <item>D-Building</item>
+        <item>B-Building</item>
+        <item>A-Building</item>
+        <item>R-Building</item>
+        <item>N-Building</item>
+        <item>T-Building</item>
+        <item>S-Building</item>
+    </string-array>
+    <string name="post_building_label">Building</string>
+    <string name="post_room_number_label">Room no.</string>
+    <string name="post_room_number_hint">eg. 222</string>
+    <string name="post_time_limit_label">Available until:</string>
+    <string name="post_food_desc_label">Enter additional information (optional)</string>
+
+
 </resources>
