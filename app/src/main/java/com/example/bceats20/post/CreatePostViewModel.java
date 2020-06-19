@@ -1,14 +1,12 @@
-package com.example.bceats20.ui.post;
+package com.example.bceats20.post;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class PostViewModel extends ViewModel {
+public class CreatePostViewModel extends ViewModel {
 
 //    private MutableLiveData<String> mText;
 //
-//    public PostViewModel() {
+//    public CreatePostViewModel() {
 //        mText = new MutableLiveData<>();
 //        mText.setValue("This is my listings fragment");
 //    }
