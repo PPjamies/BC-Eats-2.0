@@ -1,4 +1,4 @@
-package com.example.bceats20.ui.post;
+package com.example.bceats20.post;
 
 import android.os.Bundle;
 
@@ -11,13 +11,12 @@ import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 
 import com.example.bceats20.R;
-
-public class PostActivity extends AppCompatActivity {
+public class CreatePostActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_post);
+        setContentView(R.layout.activity_create_post);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        app:srcCompat="@drawable/ic_menu_fastfood"
+        app:civ_border_width="1dp"
+        app:civ_border_color="@color/black"
+        android:id="@+id/list_item_img"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:textSize="@dimen/small_text"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="20dp"
+            android:id="@+id/list_item_title"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:textSize="@dimen/small_text"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="20dp"
+            android:layout_below="@id/list_item_title"
+            android:id="@+id/list_item_location"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:textSize="@dimen/small_text"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="20dp"
+            android:layout_below="@id/list_item_location"
+            android:id="@+id/list_item_time_lmt"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:textSize="@dimen/small_text"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="20dp"
+            android:layout_below="@id/list_item_time_lmt"
+            android:id="@+id/list_item_desc"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

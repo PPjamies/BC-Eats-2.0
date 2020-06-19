@@ -23,7 +23,7 @@ public class ListingsFragment extends Fragment {
         mListingsViewModel =
                 ViewModelProviders.of(this).get(ListingsViewModel.class);
         View root = inflater.inflate(R.layout.fragment_listings, container, false);
-        final TextView textView = root.findViewById(R.id.text_gallery);
+        final TextView textView = root.findViewById(R.id.text_listings);
         mListingsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
