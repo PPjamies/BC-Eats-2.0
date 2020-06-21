@@ -17,4 +17,9 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <!--spinner text color-->
+    <style name="SpinnerTheme">
+        <item name="android:textColor">@color/hintGrey</item>
+    </style>
+
 </resources>

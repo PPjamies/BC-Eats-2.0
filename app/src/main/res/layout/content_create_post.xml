@@ -37,7 +37,8 @@
             android:layout_height="wrap_content"
             android:text="@string/post_building_label"
             android:textSize="@dimen/large_text"
-            android:layout_below="@id/post_title_et" />
+            android:layout_below="@id/post_title_et"
+            android:layout_alignParentLeft="true"/>
 
         <Spinner
             android:id="@+id/post_spinner"
@@ -45,6 +46,7 @@
             android:layout_height="40dp"
             android:layout_marginTop="10dp"
             app:backgroundTint="@color/hintGrey"
+            android:theme="@style/SpinnerTheme"
             android:layout_below="@id/post_building_label"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
@@ -63,17 +65,16 @@
 
         <EditText
             android:id="@+id/post_room_et"
-            android:layout_width="@dimen/special_edit_text_width"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/post_widget_bottom_margin"
             android:hint="@string/post_room_number_hint"
             android:textSize="@dimen/medium_text"
-            app:backgroundTint="@android:color/transparent"
-            android:drawableRight="@drawable/ic_arrow_drop_down"
+            app:backgroundTint="@color/hintGrey"
             android:layout_below="@id/post_room_label"
-            android:layout_alignParentRight="true"
             android:layout_alignTop="@id/post_spinner"
-            android:drawableEnd="@drawable/ic_arrow_drop_down"
+            android:layout_alignLeft="@id/post_room_label"
+            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
 
         <TextView
