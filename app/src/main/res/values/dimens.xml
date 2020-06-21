@@ -10,7 +10,7 @@
     <!--post-->
     <dimen name="text_margin">16dp</dimen>
     <dimen name="text_padding">10dp</dimen>
-    <dimen name="spinner_width">96dp</dimen>
+    <dimen name="spinner_width">140dp</dimen>
     <dimen name="special_edit_text_width">96dp</dimen>
     <dimen name="post_widget_bottom_margin">20dp</dimen>
 

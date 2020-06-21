@@ -5,4 +5,9 @@
         <item name="windowNoTitle">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
+
+    <!--spinner text color-->
+    <style name="SpinnerTheme">
+        <item name="android:textColor">@color/hintGrey</item>
+    </style>
 </resources>
