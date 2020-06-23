@@ -2,6 +2,7 @@ package com.example.bceats20.post;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.util.Log;
 
 import com.example.bceats20.model.Posting;
 
@@ -10,6 +11,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class CreatePostViewModel extends ViewModel {
+    private static final String TAG = "CreatePostingViewModel";
+
     private PostRepository mPostRepository; //manages data from external sources
     private MutableLiveData<Bitmap> mBitmap;
     private MutableLiveData<Uri> mUri;
@@ -28,8 +31,12 @@ public class CreatePostViewModel extends ViewModel {
         posting.setTimeLimit(timeLimit);
         posting.setDescription(description);
 
-        String mImageKey = mPostRepository.UPLOAD_NEW_POSTING(posting);
-        mPostRepository.UPLOAD_NEW_POSTING_IMAGE(mUri.getValue(),mImageKey);
+        if(mUri.getValue() != null) {
+            String mImageKey = mPostRepository.UPLOAD_NEW_POSTING(posting);
+            mPostRepository.UPLOAD_NEW_POSTING_IMAGE(mUri.getValue(), mImageKey);
+        }else{
+            Log.d(TAG, "setPosting: the uri is null wtf");
+        }
     }
 
     public LiveData<Bitmap> getBitmap(){

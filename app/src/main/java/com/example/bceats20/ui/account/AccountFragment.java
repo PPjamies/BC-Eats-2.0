@@ -13,7 +13,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.example.bceats20.R;
-
 public class AccountFragment extends Fragment {
 
     private AccountViewModel mAccountViewModel;

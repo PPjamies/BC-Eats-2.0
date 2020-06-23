@@ -234,10 +234,14 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), " some_error_while_uploading  ", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "onActivityResult: data is null");
                 }
             } else {
+                Log.d(TAG, "onActivityResult: build version is less that build version with codes N");
                 bitmap = BitmapFactory.decodeFile(captureMediaFile.getAbsolutePath());
                 bytesDocumentsTypePicture = new ImageUtils().getBytesFromBitmap(bitmap);
+                String path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "Title", null);
+                mViewModel.setUri(Uri.parse(path));
                 mViewModel.setBitmap(bitmap);
                 mImage.setImageBitmap(bitmap);
             }

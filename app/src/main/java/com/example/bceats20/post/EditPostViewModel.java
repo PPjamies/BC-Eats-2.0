@@ -4,10 +4,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
 
-import com.example.bceats20.model.BitmapUriWrapper;
 import com.example.bceats20.model.Posting;
-
-import java.util.HashMap;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -44,7 +41,7 @@ public class EditPostViewModel extends ViewModel {
     public LiveData<Posting> getPosting(){
         if(mPosting == null){
             Log.d(TAG, "getPosting: mPosting is null");
-            mPosting = mPostRepository.GET_POSTING("-MASTpK7epAtChtg8Hpw");
+            mPosting = mPostRepository.GET_POSTING("-MAXPlVPc8YOtyR-DGx_");
             if(mPosting != null)
                 Log.d(TAG, "getPosting: mPosting is not null anymore");
         }
@@ -54,7 +51,7 @@ public class EditPostViewModel extends ViewModel {
     public LiveData<Bitmap> getBitmap(){
         if(mBitmap == null){
             Log.d(TAG, "getBitmap: mBitmap is null");
-            mBitmap = mPostRepository.GET_POSTING_IMAGE("-MASTpK7epAtChtg8Hpw");
+            mBitmap = mPostRepository.GET_POSTING_IMAGE("-MAXPlVPc8YOtyR-DGx_");
         }
         return mBitmap;
     }

@@ -246,6 +246,8 @@ public class EditPostActivity extends AppCompatActivity implements AdapterView.O
             } else {
                 bitmap = BitmapFactory.decodeFile(captureMediaFile.getAbsolutePath());
                 bytesDocumentsTypePicture = new ImageUtils().getBytesFromBitmap(bitmap);
+                String path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "Title", null);
+                mViewModel.setUri(Uri.parse(path));
                 mViewModel.setBitmap(bitmap);
                 mImage.setImageBitmap(bitmap);
             }
