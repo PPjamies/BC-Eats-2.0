@@ -20,13 +20,12 @@
             android:layout_centerHorizontal="true"
             android:id="@+id/frame">
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/post_img"
                 android:layout_width="140dp"
                 android:layout_height="140dp"
                 android:layout_marginTop="10dp"
                 android:contentDescription="@string/img_content_desc"
-                app:srcCompat="@drawable/ic_menu_fastfood"
                 android:layout_gravity="center_horizontal" />
 
             <ImageButton

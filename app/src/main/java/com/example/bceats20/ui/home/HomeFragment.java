@@ -1,6 +1,8 @@
 package com.example.bceats20.ui.home;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import com.example.bceats20.data.LoginDataSource;
 import com.example.bceats20.glide.GlideApp;
 import com.example.bceats20.model.Posting;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -33,8 +36,10 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 public class HomeFragment extends Fragment {
+    private static final String TAG = "HomeFragment";
 
-    private HomeViewModel homeViewModel;
+    private HomeViewModel mHomeViewModel;
+    private Context mContext;
 
     //firebase database
     private FirebaseDatabase database;
@@ -47,33 +52,45 @@ public class HomeFragment extends Fragment {
     private LinearLayoutManager linearLayoutManager;
     private FirebaseRecyclerAdapter mFirebaseRecyclerAdapter;
 
+    //Widgets
+    private TextView mDateTextView;
+    private TextView mHomeTextView;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel =
+        mContext = getActivity().getApplicationContext();
+        mHomeViewModel =
                 ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
         //initialize view models
-        final TextView dateTextView = root.findViewById(R.id.home_date_text);
-        homeViewModel.getDateText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        mDateTextView = root.findViewById(R.id.home_date_text);
+        mHomeViewModel.getDateText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
-                dateTextView.setText(s);
+                mDateTextView.setText(s);
+            }
+        });
+
+        mHomeTextView = root.findViewById(R.id.home_no_posts_text);
+        mHomeViewModel.hasPosts().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if(aBoolean == true){
+                    mHomeTextView.setVisibility(TextView.GONE);
+                }else{
+                    mHomeTextView.setVisibility(TextView.VISIBLE);
+                }
             }
         });
 
         //initialize firebase recycler view
-        initializeRecyclerView();
+        mRecyclerView = (RecyclerView) root.findViewById(R.id.home_recycler_view);
+        linearLayoutManager = new LinearLayoutManager(mContext);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
         fetch();
 
         return root;
-    }
-
-
-    private void initializeRecyclerView(){
-        mRecyclerView = (RecyclerView)getActivity().findViewById(R.id.home_recycler_view);
-        linearLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        mRecyclerView.setLayoutManager(linearLayoutManager);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -112,14 +129,13 @@ public class HomeFragment extends Fragment {
 
     private void fetch(){
         //get current date
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM dd, yyyy", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
         String date = dateFormat.format(new Date());
 
-        //match current date with a branch in database
-        query = FirebaseDatabase.getInstance().getReference("date").equalTo(date);
-//                .orderByChild("date")
-//                .equalTo(date);
 
+        //match current date with a branch in database
+        query = FirebaseDatabase.getInstance().getReference()
+                .child(date);
 
         FirebaseRecyclerOptions<Posting> options =
                 new FirebaseRecyclerOptions.Builder<Posting>()
@@ -127,6 +143,7 @@ public class HomeFragment extends Fragment {
                         .build();
 
         mFirebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Posting, ViewHolder>(options) {
+
             @Override
             public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 View view = LayoutInflater.from(parent.getContext())
@@ -142,12 +159,13 @@ public class HomeFragment extends Fragment {
                 String room = model.getRoom();
                 locationSB.append("In ").append(building).append(", room ").append(room);
 
+                String timeLimit = "Available until: " + model.getTimeLimit();
+
                 holder.setTxtTitle(model.getTitle());
                 holder.setTxtLocation(locationSB.toString());
-                holder.setTxtTimeLimit(model.getTimeLimit());
+                holder.setTxtTimeLimit(timeLimit);
                 holder.setTxtDescription(model.getDescription());
                 holder.setKey(model.getImageKey());
-
                 getImg(holder,position,model);
             }
 
@@ -162,5 +180,17 @@ public class HomeFragment extends Fragment {
             }
         };
         mRecyclerView.setAdapter(mFirebaseRecyclerAdapter);
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        mFirebaseRecyclerAdapter.startListening();
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        mFirebaseRecyclerAdapter.stopListening();
     }
 }
