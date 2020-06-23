@@ -8,7 +8,14 @@ public class Posting {
     private String mDescription;
     private String mImageKey;
 
-    public Posting(){}
+    public Posting(){
+        mTitle="";
+        mBuilding="";
+        mRoom="";
+        mTimeLimit="";
+        mDescription="";
+        mImageKey="";
+    }
 
     public Posting(String title, String building, String room, String timeLimit, String description, String imageKey) {
         mTitle = title;

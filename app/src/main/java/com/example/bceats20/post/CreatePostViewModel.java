@@ -10,14 +10,14 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class CreatePostViewModel extends ViewModel {
-    private CreatePostRepository mCreatePostRepository; //manages data from external sources
+    private PostRepository mPostRepository; //manages data from external sources
     private MutableLiveData<Bitmap> mBitmap;
     private MutableLiveData<Uri> mUri;
 
 
     //Constructor
     public CreatePostViewModel() {
-       mCreatePostRepository = new CreatePostRepository();
+       mPostRepository = new PostRepository();
     }
 
     public void setPosting(String title, String building, String room, String timeLimit, String description){
@@ -28,8 +28,8 @@ public class CreatePostViewModel extends ViewModel {
         posting.setTimeLimit(timeLimit);
         posting.setDescription(description);
 
-        String mImageKey = mCreatePostRepository.UPLOAD_NEW_POSTING(posting);
-        mCreatePostRepository.UPLOAD_NEW_POSTING_IMAGE(mUri.getValue(),mImageKey);
+        String mImageKey = mPostRepository.UPLOAD_NEW_POSTING(posting);
+        mPostRepository.UPLOAD_NEW_POSTING_IMAGE(mUri.getValue(),mImageKey);
     }
 
     public LiveData<Bitmap> getBitmap(){
