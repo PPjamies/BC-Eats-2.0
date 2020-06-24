@@ -36,8 +36,6 @@
     <string name="home_no_posts">There are no new posts</string>
 
     <!--Account-->
-    <string name="account_username_label">Username</string>
-    <string name="account_password_label">Password</string>
     <string name="account_phone_label">Phone</string>
     <string name="account_header_desc">Account avatar</string>
 

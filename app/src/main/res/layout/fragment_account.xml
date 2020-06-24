@@ -4,8 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clickable="true"
     android:orientation="vertical"
-    tools:context=".ui.account.AccountFragment">
+    tools:context=".ui.account.AccountFragment"
+    android:id="@+id/account_linear_layout">
 
     <ImageView
         android:id="@+id/image_account"
@@ -15,73 +17,6 @@
         android:layout_marginTop="8dp"
         android:contentDescription="@string/account_header_desc"
         app:srcCompat="@mipmap/ic_launcher_round"/>
-
-    <TextView
-        android:id="@+id/username_label_account"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="15dp"
-        android:textSize="20sp"
-        android:text="@string/account_username_label"
-        android:textColor="@color/black" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="15dp">
-        <TextView
-            android:id="@+id/text_username_account"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20sp" />
-        <ImageButton
-            android:id="@+id/edit_btn_username_account"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:background="@color/white"
-            app:srcCompat="@drawable/ic_edit"/>
-    </RelativeLayout>
-
-
-    <TextView
-        android:id="@+id/password_label_account"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="15dp"
-        android:textSize="20sp"
-        android:text="@string/account_password_label"
-        android:textColor="@color/black" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="15dp">
-        <TextView
-            android:id="@+id/text_password_account"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:text="@string/placeholdertext"/>
-        <ImageButton
-            android:id="@+id/edit_btn_password_account"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:background="@color/white"
-            app:srcCompat="@drawable/ic_edit"/>
-    </RelativeLayout>
-
 
     <TextView
         android:id="@+id/phone_label_account"
@@ -101,19 +36,40 @@
         android:layout_marginStart="15dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="15dp">
-        <TextView
+        <EditText
             android:id="@+id/text_phone_account"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:text="@string/placeholdertext"/>
+            android:background="@android:color/transparent"
+            android:textColor="@color/hintGrey"
+            android:textSize="20sp" />
+
+        <View
+            android:id="@+id/line_account"
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/hintGrey"
+            android:visibility="gone"
+            android:layout_below="@id/text_phone_account"/>
+
         <ImageButton
-            android:id="@+id/edit_btn_phone_account"
+            android:id="@+id/edit_phone_btn_account"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:background="@color/white"
             app:srcCompat="@drawable/ic_edit"/>
+
+        <ImageButton
+            android:id="@+id/edit_phone_done_btn_account"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:visibility="gone"
+            android:background="@color/white"
+            app:srcCompat="@drawable/ic_done"/>
+
     </RelativeLayout>
 
 </LinearLayout>

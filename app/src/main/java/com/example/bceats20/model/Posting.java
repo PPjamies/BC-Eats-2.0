@@ -7,6 +7,7 @@ public class Posting {
     private String mTimeLimit;
     private String mDescription;
     private String mImageKey;
+    private String mPhone;
 
     public Posting(){
         mTitle="";
@@ -24,6 +25,14 @@ public class Posting {
         mTimeLimit = timeLimit;
         mDescription = description;
         mImageKey = imageKey;
+    }
+
+    public String getPhone() {
+        return mPhone;
+    }
+
+    public void setPhone(String phone) {
+        mPhone = phone;
     }
 
     public String getTitle() {
