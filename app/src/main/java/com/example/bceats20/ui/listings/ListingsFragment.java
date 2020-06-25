@@ -1,38 +1,92 @@
 package com.example.bceats20.ui.listings;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bceats20.R;
+import com.example.bceats20.model.Posting;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class ListingsFragment extends Fragment {
+    private final static String TAG = "ListingsFragment";
+    private static final String phoneNumber = "12068888888";
+    private Context mContext;
 
+    //view model
     private ListingsViewModel mListingsViewModel;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        mListingsViewModel =
-                ViewModelProviders.of(this).get(ListingsViewModel.class);
+    //recyclerview
+    private RecyclerView mRecyclerView;
+    private LinearLayoutManager mLinearLayoutManager;
+    private Adapter mAdapter;
+    private ArrayList<Posting> mList;
 
-        View root = inflater.inflate(R.layout.fragment_listings, container, false);
+    //widgets
+    private TextView mHasNoPostTextView;
+    private TextView mDateText;
 
-        final TextView textView = root.findViewById(R.id.text_listings);
-
-        mListingsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+    private void loadTextFromViewModel(){
+        mListingsViewModel.getDateText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
+            public void onChanged(String s) {
+                mDateText.setText(s);
             }
         });
+    }
+
+
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_listings, container, false);
+        mContext = getActivity().getApplicationContext();
+
+        //initialize widgets
+        mHasNoPostTextView = (TextView)root.findViewById(R.id.listings_no_posts_text);
+        mDateText = (TextView)root.findViewById(R.id.listings_date_text);
+
+        //initialize view model
+        mListingsViewModel = ViewModelProviders.of(this).get(ListingsViewModel.class);
+        loadTextFromViewModel();
+        mListingsViewModel.hasPosts(phoneNumber).observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if(aBoolean){
+                    mHasNoPostTextView.setVisibility(TextView.GONE);
+                }else{
+                    mHasNoPostTextView.setVisibility(TextView.VISIBLE);
+                }
+            }
+        });
+
+        mList = new ArrayList<>();
+        mListingsViewModel.getListings(phoneNumber).observe(getViewLifecycleOwner(), new Observer<ArrayList<Posting>>() {
+            @Override
+            public void onChanged(ArrayList<Posting> postings) {
+                mList = postings;
+                mAdapter = new Adapter(mContext,mList);
+                mRecyclerView.setAdapter(mAdapter);
+            }
+        });
+
+
+        //initialize recycler view
+        mRecyclerView = (RecyclerView) root.findViewById(R.id.listings_recycler_view);
+        mLinearLayoutManager = new LinearLayoutManager(mContext);
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+
         return root;
     }
 }
