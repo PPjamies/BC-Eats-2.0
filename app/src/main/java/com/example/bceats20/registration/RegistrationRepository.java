@@ -31,6 +31,7 @@ public class RegistrationRepository {
 
     //Finals
     private static final String TAG = "PhoneAuthActivity";
+    private static final String AUTH_CODE = "123456";
 
     //Firebase variables
     private FirebaseAuth mAuth;
@@ -47,12 +48,13 @@ public class RegistrationRepository {
 //                number,
                 //TEMPORARY testing number
                 //Todo: change this before production
-                "+1 650-555-3434",
-                60,
+                "+16505553434",
+                120,
                 TimeUnit.SECONDS,
                 TaskExecutors.MAIN_THREAD,
                 mCallBack
         );
+        Log.d(TAG, "sendVerificationCode: afterVerify");
         mVerificationInProgress = true;
     }
 
@@ -63,6 +65,10 @@ public class RegistrationRepository {
             Log.d(TAG, "onCodeSent: s="+verificationId);
             super.onCodeSent(verificationId, forceResendingToken);
             verificationID = verificationId;
+            PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, AUTH_CODE);
+//            Log.d(TAG, "onCodeSent: credential = "+credential);
+//                // [END verify_with_code]
+//            signInWithCredential(credential);
             mResendToken = forceResendingToken;
         }
 
@@ -101,6 +107,7 @@ public class RegistrationRepository {
     }
 
     private void signInWithCredential(PhoneAuthCredential credential){
+        Log.d(TAG, "signInWithCredential: credential: "+credential);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener((Executor) RegistrationRepository.this, new OnCompleteListener<AuthResult>() {
                     @Override

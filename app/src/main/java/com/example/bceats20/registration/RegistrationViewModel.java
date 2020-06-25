@@ -62,11 +62,13 @@ public class RegistrationViewModel extends ViewModel {
     public void phoneAuth(){
 
         Log.d(TAG, "phoneAuth: phoneAuth() method in ViewModel called");
-//        repository.sendVerificationCode(getPhonenumber().getValue());
+        //Todo: this is a temporary testing hardcoded number. Change for production
+        repository.sendVerificationCode("+16505553434");
+//        repository.sendVerificationCode(getAreacode().getValue().concat(getPhonenumber().getValue()));
     }
 
     public void addUserToDatabase(){
         Log.d(TAG, "addUserToDatabase: ");
-        repository.uploadUserToFirebaseDatabase("5555555555");
+        repository.uploadUserToFirebaseDatabase(getAreacode().getValue().concat(getPhonenumber().getValue()));
     }
 }
