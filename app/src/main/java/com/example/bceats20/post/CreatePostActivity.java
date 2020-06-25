@@ -76,6 +76,7 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate: Created CreatPostActivity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
         mContext = this;
