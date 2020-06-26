@@ -16,6 +16,7 @@ public class Posting {
         mTimeLimit="";
         mDescription="";
         mImageKey="";
+        mPhone="";
     }
 
     public Posting(String title, String building, String room, String timeLimit, String description, String imageKey) {
@@ -82,5 +83,4 @@ public class Posting {
     public void setImageKey(String imageKey) {
         mImageKey = imageKey;
     }
-
 }

@@ -10,7 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.example.bceats20.utility.ImageUtils;
+import com.example.bceats20.utils.ImageUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.annotation.Nullable;

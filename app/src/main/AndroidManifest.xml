@@ -14,10 +14,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".pj_login.PhoneAuthActivity"
+        <activity android:name=".pj_login.authentication.PhoneAuthActivity"
             android:parentActivityName=".pj_login.LoginActivity"/>
         <activity android:name=".MainActivity"
-            android:parentActivityName=".pj_login.PhoneAuthActivity"
+            android:parentActivityName=".pj_login.authentication.PhoneAuthActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".pj_login.LoginActivity"

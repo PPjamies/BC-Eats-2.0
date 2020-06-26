@@ -4,6 +4,7 @@ public class User {
     private String mPhone;
     private String mSessionToken; //possibly not needed
     private String mPushToken; //possibly not needed
+    public Boolean isNewUser, isCreated;
 
     public User(){}
 

@@ -1,4 +1,4 @@
-package com.example.bceats20.utility;
+package com.example.bceats20.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;

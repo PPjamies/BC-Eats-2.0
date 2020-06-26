@@ -1,9 +1,8 @@
-package com.example.bceats20.pj_login;
+package com.example.bceats20.pj_login.authentication;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -13,15 +12,14 @@ import android.widget.Toast;
 
 import com.example.bceats20.MainActivity;
 import com.example.bceats20.R;
+import com.example.bceats20.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskExecutors;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -31,24 +29,27 @@ import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 public class PhoneAuthActivity extends AppCompatActivity{
     private static final String TAG = "PhoneAuthActivity";
+    private static Context sContext;
 
     //tracks whether verification is in process and number is valid
     private static final String KEY_VERIFY_IN_PROGRESS = "key_verify_in_progress";
     private boolean mVerificationInProgress = false;
 
+    //view model
+    private AuthViewModel  mAuthViewModel;
 
-    private static Context sContext;
-
+    //authentication
     private FirebaseAuth mAuth;
     private String mPhone;
     private String mVerificationID;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
 
-
-
+    //widgets
     private ProgressBar mProgressBar;
     private EditText mEditText;
     private Button mButtonSignIn;
@@ -57,19 +58,13 @@ public class PhoneAuthActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pj_activity_verify_phone);
+        sContext = this;
 
         if (savedInstanceState != null) {
             onRestoreInstanceState(savedInstanceState);
         }
 
-        mAuth = FirebaseAuth.getInstance();
-        mPhone = getIntent().getStringExtra("mPhone");
-        sContext = this;
-
-        mProgressBar = (ProgressBar) findViewById(R.id.progressbar);
-        mEditText = (EditText) findViewById(R.id.editTextCode);
-        mButtonSignIn = (Button)findViewById(R.id.buttonSignIn);
-
+        initialize();
         startPhoneVerification(mPhone);
 
         mButtonSignIn.setOnClickListener(new View.OnClickListener() {
@@ -85,6 +80,15 @@ public class PhoneAuthActivity extends AppCompatActivity{
                 verifyPhoneNumberWithCode(code);
             }
         });
+    }
+
+    private void initialize(){
+        mAuthViewModel = ViewModelProviders.of(this).get(AuthViewModel.class);
+        mAuth = FirebaseAuth.getInstance();
+        mPhone = getIntent().getStringExtra("mPhone");
+        mProgressBar = (ProgressBar) findViewById(R.id.progressbar);
+        mEditText = (EditText) findViewById(R.id.editTextCode);
+        mButtonSignIn = (Button)findViewById(R.id.buttonSignIn);
     }
 
 /* Restores instance states to resume the phone number sign in process if your app closes before the user can sign in*/
@@ -171,53 +175,45 @@ public class PhoneAuthActivity extends AppCompatActivity{
     //google play doesn't automatically handle your sms code (non-automatic retrieval)
     private void verifyPhoneNumberWithCode(String code) {
         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationID, code);
-        signInWithCredential(credential); //we dont want to sign directly in
+        signInWithCredential(credential);
     }
 
     //This is the part that goes into repository for checking
     private void signInWithCredential(PhoneAuthCredential credential) {
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(PhoneAuthActivity.this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-
-                            FirebaseUser user = task.getResult().getUser();
-
-                            //launch next activity
-                            startMain();
-                        } else {
-                            Log.d(TAG, task.getException().getMessage());
-                            if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                                Log.d(TAG, task.getException().getMessage());
-                            }
-                        }
-                    }
-                });
+       mAuthViewModel.SignInWithPhone(credential, mPhone);
+       mAuthViewModel.signInWithPhoneResponse().observe(this, user -> {
+           if(user.isNewUser) {
+               mAuthViewModel.createUser(user);
+           }
+           startMain();
+       });
     }
 
 
 
     protected void startMain(){
-        // [START retrieve_current_token]
-        FirebaseInstanceId.getInstance().getInstanceId()
-                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "getInstanceId failed", task.getException());
-                            return;
-                        }
-
-                        // Get new Instance ID token
-                        String token = task.getResult().getToken();
-
-                        // Log and toast
-                        Log.d(TAG, "Token: " + token );
-                        Toast.makeText(PhoneAuthActivity.this, "Token: " + token, Toast.LENGTH_SHORT).show();
-                    }
-                });
+        // [START retrieve_current_token] not sure wth this is for
+//        FirebaseInstanceId.getInstance().getInstanceId()
+//                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+//                        if (!task.isSuccessful()) {
+//                            Log.w(TAG, "getInstanceId failed", task.getException());
+//                            return;
+//                        }
+//
+//                        // Get new Instance ID token
+//                        String token = task.getResult().getToken();
+//
+//                        // Log and toast
+//                        Log.d(TAG, "Token: " + token );
+//                        Toast.makeText(PhoneAuthActivity.this, "Token: " + token, Toast.LENGTH_SHORT).show();
+//                    }
+//                });
         // [END retrieve_current_token]
+
+
+        //Save user phone number to shared repo
 
         Intent intent = new Intent(PhoneAuthActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

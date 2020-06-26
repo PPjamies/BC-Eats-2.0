@@ -25,7 +25,7 @@ import android.widget.Toast;
 
 import com.example.bceats20.R;
 import com.example.bceats20.model.Posting;
-import com.example.bceats20.utility.ImageUtils;
+import com.example.bceats20.utils.ImageUtils;
 
 import java.io.File;
 import java.io.IOException;
