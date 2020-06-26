@@ -2,7 +2,6 @@ package com.example.bceats20.ui.listings;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +17,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.bceats20.R;
 import com.example.bceats20.model.Posting;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class ListingsFragment extends Fragment {
     private final static String TAG = "ListingsFragment";
-    private static final String phoneNumber = "12068888888";
+    private static final String phoneNumber = "5555555555";
     private Context mContext;
 
     //view model

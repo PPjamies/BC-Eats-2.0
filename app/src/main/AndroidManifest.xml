@@ -14,8 +14,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".pj_login.PhoneAuthActivity"
+            android:parentActivityName=".pj_login.LoginActivity"/>
+        <activity android:name=".MainActivity"
+            android:parentActivityName=".pj_login.PhoneAuthActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
-            android:name=".MainActivity"
+            android:name=".pj_login.LoginActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
