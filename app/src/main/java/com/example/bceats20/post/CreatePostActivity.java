@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -77,6 +78,10 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: Created CreatPostActivity");
+
+        SharedPreferences sharedPreferences = this.getSharedPreferences("user",Context.MODE_PRIVATE);
+        String username = sharedPreferences.getString("username","blank");
+        Log.d(TAG, "onCreate: Checking for the SharedPreferences: "+username);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
         mContext = this;

@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
 import android.text.Editable;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bceats20.R;
+import com.example.bceats20.post.CreatePostActivity;
 
 public class RegistrationActivity extends AppCompatActivity {
 
@@ -44,6 +46,7 @@ public class RegistrationActivity extends AppCompatActivity {
         mConfirmEntry = (EditText) findViewById(R.id.registrationConfirmEntry);
 
         //Add TextListeners
+        //These listen to the edit texts, and on any change will update the LiveData objects in the ViewModel
         mUsername.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -138,34 +141,37 @@ public class RegistrationActivity extends AppCompatActivity {
 
     private void loginUser() {
 
-        Toast.makeText(this, "Trying to log in",Toast.LENGTH_LONG);
+        Toast.makeText(this, "Trying to log in",Toast.LENGTH_LONG).show();
 
-        String phonenumber = mAreaCode.getText().toString().trim().concat(mPhonenumber.getText().toString().trim());
-        String username = mUsername.getText().toString().trim();
+        //Gets phonenumber and username from LiveData in ViewModel
+        String phonenumber = mViewModel.getAreacode().getValue().concat(mViewModel.getPhonenumber().getValue());
+        String username = mViewModel.getUsername().getValue();
 
         Log.d(TAG, "loginUser: Phonenumber "+phonenumber+" Username "+username);
 
         //Check if entered number is valid
         if(!PhoneNumberUtils.isGlobalPhoneNumber(phonenumber)){
             Log.d(TAG, "loginUser: PhoneNumberEntry failed");
-            Toast.makeText(this,"Please enter a valid phone number",Toast.LENGTH_LONG);
+            Toast.makeText(this,"Please enter a valid phone number",Toast.LENGTH_LONG).show();
             return;
         }
         //Check for empty username field
         if (username.compareTo("")==0){
             Log.d(TAG, "loginUser: empty username");
-            Toast.makeText(this,"Please enter a username",Toast.LENGTH_LONG);
+            Toast.makeText(this,"Please enter a username",Toast.LENGTH_LONG).show();
             return;
         }
 
         Log.d(TAG, "loginUser: Succesful Number");
-        mViewModel.setPhonenumber(phonenumber);
-        mViewModel.setUsername(username);
         mViewModel.phoneAuth();
     }
 
     private void confirmUser() {
         Log.d(TAG, "confirmUser: Bottom button clicked");
         mViewModel.addUserToDatabase();
+    }
+
+    public void failLogin(){
+        Toast.makeText(this, "Failed to log in. Requires a username and real phonenumber.", Toast.LENGTH_LONG).show();
     }
 }

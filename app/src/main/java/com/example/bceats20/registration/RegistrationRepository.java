@@ -1,3 +1,10 @@
+/*
+Much of the code in this file is pulled from these documents
+https://firebase.google.com/docs/auth/android/phone-auth
+ */
+
+
+
 package com.example.bceats20.registration;
 
 import android.content.Intent;
@@ -8,6 +15,7 @@ import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskExecutors;
@@ -40,15 +48,19 @@ public class RegistrationRepository {
     private boolean mVerificationInProgress = false;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
 
-
+    /**
+     * This function calls Firebase to send a confirmation code to the user, that they will then
+     * need to send back to Firebase to confirm them as a legitimate user
+     * @param number this is the phone number of the user to send the confirmation code to. This must be in the international phone format (+15556666) for Firebase to accept it
+     */
     public void sendVerificationCode(String number){
         Log.d(TAG, "sendVerificationCode: sendVerificationCode() called in RegistrationRepo");
 //        progressBar.setVisibility(View.VISIBLE);
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
-//                number,
-                //TEMPORARY testing number
-                //Todo: change this before production
-                "+16505553434",
+                number,
+//                //TEMPORARY testing number
+//                //Todo: change this before production
+//                "+1 555 521 5554",
                 120,
                 TimeUnit.SECONDS,
                 TaskExecutors.MAIN_THREAD,
@@ -72,6 +84,10 @@ public class RegistrationRepository {
             mResendToken = forceResendingToken;
         }
 
+        /** Once a user is verified, this is called. The code here needs to be the code the user
+         * received and needs to be entered
+         * @param phoneAuthCredential
+         */
         @Override
         public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
             Log.d(TAG, "onVerificationCompleted: " + phoneAuthCredential.getSmsCode());
@@ -97,6 +113,12 @@ public class RegistrationRepository {
             if(e instanceof FirebaseAuthInvalidCredentialsException){
 
             }
+        }
+
+        @Override
+        public void onCodeAutoRetrievalTimeOut(String s) {
+            Log.d(TAG, "onCodeAutoRetrievalTimeOut: ");
+            super.onCodeAutoRetrievalTimeOut(s);
         }
     };
 
@@ -155,5 +177,12 @@ public class RegistrationRepository {
         mDatabase.child("users").child(phonenumber).child("phone").setValue(phonenumber);
 
     }
+
+
+    //*********************************************************************************************
+    //Room local storage  https://developer.android.com/training/data-storage/room
+    //*********************************************************************************************
+
+
 
 }
