@@ -1,8 +1,5 @@
 package com.example.bceats20.post;
 
-import android.Manifest;
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,6 +11,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.bumptech.glide.util.Util;
+import com.example.bceats20.BuildConfig;
 import com.example.bceats20.utils.ImageUtils;
 import com.example.bceats20.utils.Utility;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -21,12 +20,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
@@ -44,10 +42,13 @@ import com.example.bceats20.R;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Objects;
+import java.util.UUID;
 
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
 import static android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
-import static com.example.bceats20.utils.Utility.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE;
 
 public class CreatePostActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private final String TAG = "CreatePostActivity";
@@ -88,7 +89,6 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
         mContext = this;
-
 
         //initialize widgets
         mTitle = (EditText) findViewById(R.id.post_title_et);
@@ -168,6 +168,9 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
 
 
     /* BOF gallery/camera intent */
+
+
+
      private void selectImageDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setTitle("Upload a Photo!");
@@ -175,17 +178,25 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
             @Override
             public void onClick(DialogInterface dialog, int item) {
 
+                boolean writeResults = Utility.checkWriteExternalStoragePermission(mContext);
+                boolean readResults = Utility.checkReadExternalStoragePermission(mContext);
+
                 if (items[item].equals("Take Photo"))
                 {
-                    cameraIntent();
+                    mChoice = "Take Photo";
+                    if(writeResults && readResults)
+                        cameraIntent();
                 }
                 else if (items[item].equals("Choose from Library"))
                 {
-                    galleryIntent();
+                    mChoice = "Choose from Library";
+                    if(writeResults && readResults)
+                        galleryIntent();
                 }
                 else if (items[item].equals("Cancel"))
                 {
-                    dialog.dismiss();
+                    if(writeResults && readResults)
+                        dialog.dismiss();
                 }
             }
         });
@@ -198,13 +209,12 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
 
             if (captureMediaFile != null) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                intent.putExtra(MediaStore.EXTRA_FINISH_ON_COMPLETION, true);
 
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                    Log.d(TAG, "cameraIntent: build version is less than");
                     intent.addFlags(FLAG_GRANT_READ_URI_PERMISSION | FLAG_GRANT_WRITE_URI_PERMISSION);
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, captureMediaFile);
                 } else {
-                    Log.d(TAG, "cameraIntent: read external storage is granted");
                     Uri photoUri = FileProvider.getUriForFile(mContext, mContext.getPackageName() + ".provider", captureMediaFile);
                     intent.addFlags(FLAG_GRANT_READ_URI_PERMISSION | FLAG_GRANT_WRITE_URI_PERMISSION);
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
@@ -221,11 +231,43 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
         }
 
 
-        private void galleryIntent(){
-            Log.d(TAG, "gallery intent launching");
-            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            startActivityForResult(intent, GALLERY_REQUEST);
+    private void galleryIntent(){
+        Log.d(TAG, "gallery intent launching");
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, GALLERY_REQUEST);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionResult");
+        Boolean write_permissions = false;
+        Boolean read_permissions = false;
+        
+        switch (requestCode) {
+            case Utility.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    write_permissions = true;
+                }
+
+            case Utility.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    read_permissions = true;
+                }
+                break;
         }
+        
+        if(write_permissions && read_permissions){
+            if (mChoice.equals("Take Photo")) {
+                cameraIntent();
+            } else if (mChoice.equals("Choose from Library")) {
+                galleryIntent();
+            }else{
+                //code for deny
+            }
+        }else{
+            Log.d(TAG, "onRequestPermissionsResult: read or write permission was denied");
+        }
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -253,7 +295,7 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
                 Log.d(TAG, "onActivityResult: build version is less that build version with codes N");
                 bitmap = BitmapFactory.decodeFile(captureMediaFile.getAbsolutePath());
                 bytesDocumentsTypePicture = new ImageUtils().getBytesFromBitmap(bitmap);
-                String path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "Title", null);
+                String path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, UUID.randomUUID().toString()+".png", null);
                 mViewModel.setUri(Uri.parse(path));
                 mViewModel.setBitmap(bitmap);
                 mImage.setImageBitmap(bitmap);

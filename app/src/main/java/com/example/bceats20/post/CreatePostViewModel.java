@@ -31,8 +31,8 @@ public class CreatePostViewModel extends ViewModel {
         posting.setTimeLimit(timeLimit);
         posting.setDescription(description);
 
+        String mImageKey = mPostRepository.UPLOAD_NEW_POSTING(posting);
         if(mUri.getValue() != null) {
-            String mImageKey = mPostRepository.UPLOAD_NEW_POSTING(posting);
             mPostRepository.UPLOAD_NEW_POSTING_IMAGE(mUri.getValue(), mImageKey);
         }else{
             Log.d(TAG, "setPosting: the uri is null wtf");
@@ -57,6 +57,6 @@ public class CreatePostViewModel extends ViewModel {
     }
 
     public void setUri(Uri uri){
-        mUri.postValue(uri);
+        mUri.setValue(uri);
     }
 }
