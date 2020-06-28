@@ -43,6 +43,7 @@ import static android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
 public class EditPostActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private final String TAG = "EditPostActivity";
     private Context mContext;
+    private Posting mPosting;
 
     //view model
     EditPostViewModel mViewModel;
@@ -72,33 +73,20 @@ public class EditPostActivity extends AppCompatActivity implements AdapterView.O
             "N-Building","T-Building", "S-Building"};
 
     private void restoreFromViewModel(){
-        mViewModel.getBitmap().observe(this, new Observer<Bitmap>() {
-            @Override
-            public void onChanged(@Nullable Bitmap bitmap) {
-                mImage.setImageBitmap(bitmap);
-            }
-        });
+        mViewModel.getBitmap(mPosting.getImageKey()).observe(this, bitmap -> mImage.setImageBitmap(bitmap));
 
-        mViewModel.getUri().observe(this, new Observer<Uri>() {
-            @Override
-            public void onChanged(Uri uri) {
-                selectedImage = uri;
-            }
-        });
+        mViewModel.getUri().observe(this, uri -> selectedImage = uri);
 
-        mViewModel.getPosting().observe(this, new Observer<Posting>() {
-            @Override
-            public void onChanged(Posting posting) {
-                mTitle.setText(posting.getTitle());
-                for(int pos=0; pos<buildings.length; pos++){
-                    if(buildings[pos].equals(posting.getBuilding())){
-                        mSpinner.setSelection(pos);
-                    }
+        mViewModel.getPosting(mPosting.getImageKey()).observe(this, posting -> {
+            Log.d(TAG, "restoreFromViewModel: " + posting.getTitle());
+            mTitle.setText(posting.getTitle());
+            for(int pos=0; pos<buildings.length; pos++){
+                if(buildings[pos].equals(posting.getBuilding())){
+                    mSpinner.setSelection(pos);
                 }
-                mRoom.setText(posting.getRoom());
-                /* user will re-specify the time limit */
-                mDescription.setText(posting.getDescription());
             }
+            mRoom.setText(posting.getRoom());
+            mDescription.setText(posting.getDescription());
         });
     }
 
@@ -107,6 +95,10 @@ public class EditPostActivity extends AppCompatActivity implements AdapterView.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_post);
         mContext = this;
+
+        //grab intent object from adapter
+        Intent intent = getIntent();
+        mPosting = (Posting)intent.getSerializableExtra("mPosting");
 
         //initialize widgets
         mTitle = (EditText) findViewById(R.id.post_title_et);
@@ -135,21 +127,14 @@ public class EditPostActivity extends AppCompatActivity implements AdapterView.O
 
         //initialize and set image button - open camera or gallery
         mImageButton = (ImageButton) findViewById(R.id.post_img_btn);
-        mImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                selectImageDialog();
-            }
-        });
+        mImageButton.setOnClickListener(view -> selectImageDialog());
 
         //initialize and set post button
         mSaveButton = (Button) findViewById(R.id.save_btn);
-        mSaveButton.setOnClickListener((new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                uploadPosting();
-            }
-        }));
+        mSaveButton.setOnClickListener(view -> {
+            uploadPosting();
+            close();
+        });
     }
 
 
@@ -319,7 +304,6 @@ public class EditPostActivity extends AppCompatActivity implements AdapterView.O
             mDescription.requestFocus();
         }else{
             mViewModel.setPosting(title,building,room,timeLimit,description);
-            close();
         }
     }
     /* EOF upload posting */
@@ -327,7 +311,7 @@ public class EditPostActivity extends AppCompatActivity implements AdapterView.O
 
     /*BOF close*/
     public void close(){
-        //closes out of activity
+        finish();
     }
     /*EOF close*/
 }

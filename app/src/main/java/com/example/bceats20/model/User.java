@@ -1,6 +1,8 @@
 package com.example.bceats20.model;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private String mPhone;
     private String mSessionToken; //possibly not needed
     private String mPushToken; //possibly not needed

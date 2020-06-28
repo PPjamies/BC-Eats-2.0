@@ -1,6 +1,9 @@
 package com.example.bceats20.ui.listings;
 
+import android.util.Log;
+
 import com.example.bceats20.model.Posting;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -82,5 +85,27 @@ public class ListingsRepository {
                     }
                 });
         return mListOfPostings;
+    }
+
+    public void DELETE_POSTING(@NonNull final String key){
+        //removes from firebase
+        myDatabaseRef
+                .child(getDate())
+                .child(key)
+                .removeValue();
+
+        //removes image from storage
+        final String mStoragePathReference = new StringBuilder("images/").append(key).append(".jpg").toString();
+        StorageReference imgRef = mStorageRef.child(mStoragePathReference);
+        imgRef.delete().addOnSuccessListener(aVoid -> {
+            // File deleted successfully
+            Log.d(TAG, "onSuccess: deleted file");
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Uh-oh, an error occurred!
+                Log.d(TAG, "onFailure: did not delete file");
+            }
+        });
     }
 }

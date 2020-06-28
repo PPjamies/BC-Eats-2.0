@@ -1,28 +1,23 @@
 package com.example.bceats20.ui.listings;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
-import android.media.Image;
-import android.util.Log;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.bceats20.R;
 import com.example.bceats20.glide.GlideApp;
 import com.example.bceats20.model.Posting;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
+import com.example.bceats20.post.EditPostActivity;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -30,11 +25,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private Context mContext;
+    private Activity mActivity;
     private List<Posting> mList;
+    private ListingsViewModel mListingsViewModel;
 
-    public Adapter(Context context, List<Posting> listOfPostings){
+    public Adapter(Activity activity, List<Posting> listOfPostings){
         this.mList = listOfPostings;
-        this.mContext = context;
+        this.mContext = activity.getApplicationContext();
+        this.mActivity = activity;
+        mListingsViewModel = new ListingsViewModel();
     }
 
     @NonNull
@@ -66,19 +65,20 @@ public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         viewholder.setKey(posting.getImageKey());
         getImg(viewholder,position,posting);
 
-        viewholder.mEditBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //go to edit posting activity
-                Toast.makeText(v.getContext(), "EDIT CLICKED", Toast.LENGTH_SHORT).show();
-            }
+        viewholder.mEditBtn.setOnClickListener(v -> {
+            goToEditPostActivity(posting);
         });
-        viewholder.mDeleteBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //open delete alert dialog
-                Toast.makeText(v.getContext(), "DELETE CLICKED", Toast.LENGTH_SHORT).show();
-            }
+        viewholder.mDeleteBtn.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+            builder.setTitle(R.string.dialog_title)
+                    .setMessage(R.string.dialog_message)
+                    .setPositiveButton(R.string.delete_btn, (dialog, id) -> {
+                       mListingsViewModel.deletePosting(posting.getImageKey());
+                    })
+                    .setNegativeButton(R.string.cancel_btn, (dialog, id) -> {
+                        // User cancelled the dialog
+                    });
+            builder.show();
         });
     }
 
@@ -134,5 +134,11 @@ public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         public void setKey(String string){
             mKey = string;
         }
+    }
+
+    public void goToEditPostActivity(Posting posting){
+        Intent intent = new Intent(mContext.getApplicationContext(), EditPostActivity.class);
+        intent.putExtra("mPosting", posting);
+        mContext.startActivity(intent);
     }
 }

@@ -1,6 +1,8 @@
 package com.example.bceats20.model;
 
-public class Posting {
+import java.io.Serializable;
+
+public class Posting implements Serializable {
     private String mTitle;
     private String mBuilding;
     private String mRoom;

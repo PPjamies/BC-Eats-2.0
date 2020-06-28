@@ -1,10 +1,7 @@
 package com.example.bceats20.ui.listings;
 
-import android.util.Log;
-
 import com.example.bceats20.model.Posting;
 
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,13 +37,15 @@ public class ListingsViewModel extends ViewModel {
         return mDateText;
     }
 
-    //checks to see if user has any postings
     public LiveData<Boolean> hasPosts(String phoneNumber){
         mHasPosts = mListingsRepository.USER_HAS_ACTIVE_POSTINGS(phoneNumber);
         return mHasPosts;
     }
 
-    //returns user postings
+    public void setHasPosts(Boolean bool){
+        mHasPosts.setValue(bool);
+    }
+
     public LiveData<ArrayList<Posting>> getListings(String phoneNumber){
         if(mListings == null){
             mListings = new MutableLiveData<>();
@@ -54,10 +53,12 @@ public class ListingsViewModel extends ViewModel {
         mListings = mListingsRepository.GET_USER_ACTIVE_POSTINGS(phoneNumber);
         return mListings;
     }
-    public void setHasPosts(Boolean bool){
-        mHasPosts.setValue(bool);
-    }
+
     public void setList(ArrayList<Posting> list){
         mListings.setValue(list);
+    }
+
+    public void deletePosting(String mKey){
+        mListingsRepository.DELETE_POSTING(mKey);
     }
 }

@@ -2,6 +2,7 @@ package com.example.bceats20.post;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.service.voice.AlwaysOnHotwordDetector;
 import android.util.Log;
 
 import com.example.bceats20.model.Posting;
@@ -14,7 +15,7 @@ public class EditPostViewModel extends ViewModel {
     private static final String TAG = "EditPostViewModel";
 
     private PostRepository mPostRepository;
-    private MutableLiveData<Posting> mPosting;
+    public MutableLiveData<Posting> mPosting;
     private MutableLiveData<Bitmap> mBitmap;
     private MutableLiveData<Uri> mUri;
 
@@ -29,29 +30,27 @@ public class EditPostViewModel extends ViewModel {
         posting.setRoom(room);
         posting.setTimeLimit(timeLimit);
         posting.setDescription(description);
+        posting.setPhone(mPosting.getValue().getPhone());
         posting.setImageKey(mPosting.getValue().getImageKey());
         mPosting.setValue(posting);
 
-        if(mUri.getValue() != null) {
-            mPostRepository.UPDATE_POSTING(mPosting.getValue(), mPosting.getValue().getImageKey());
+        mPostRepository.UPDATE_POSTING(mPosting.getValue(), mPosting.getValue().getImageKey());
+        if (mUri.getValue() != null) {
             mPostRepository.UPLOAD_NEW_POSTING_IMAGE(mUri.getValue(), mPosting.getValue().getImageKey());
         }
     }
 
-    public LiveData<Posting> getPosting(){
+    public LiveData<Posting> getPosting(String postID){
         if(mPosting == null){
-            Log.d(TAG, "getPosting: mPosting is null");
-            mPosting = mPostRepository.GET_POSTING("-MAXPlVPc8YOtyR-DGx_");
-            if(mPosting != null)
-                Log.d(TAG, "getPosting: mPosting is not null anymore");
+            mPosting = new MutableLiveData<>();
         }
+        mPosting = mPostRepository.GET_POSTING(postID);
         return mPosting;
     }
 
-    public LiveData<Bitmap> getBitmap(){
+    public LiveData<Bitmap> getBitmap(String postID){
         if(mBitmap == null){
-            Log.d(TAG, "getBitmap: mBitmap is null");
-            mBitmap = mPostRepository.GET_POSTING_IMAGE("-MAXPlVPc8YOtyR-DGx_");
+            mBitmap = mPostRepository.GET_POSTING_IMAGE(postID);
         }
         return mBitmap;
     }
@@ -62,13 +61,12 @@ public class EditPostViewModel extends ViewModel {
 
     public LiveData<Uri> getUri(){
         if(mUri == null){
-            Log.d(TAG, "getUri: mUri is null");
-            mUri = new MutableLiveData<Uri>();
+            mUri = new MutableLiveData<>();
         }
         return mUri;
     }
 
     public void setUri(Uri uri){
-        mUri.postValue(uri);
+        mUri.setValue(uri);
     }
 }

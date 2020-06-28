@@ -13,6 +13,7 @@ android {
     defaultConfig {
         applicationId "com.example.bceats20"
         minSdkVersion 16
+        //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"

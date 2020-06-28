@@ -84,6 +84,7 @@ public class PostRepository {
 
     //overwrites the current listing in the branch
     public void UPDATE_POSTING(final Posting mUpdatedPosting, @NonNull final String mKey) {
+        Log.d(TAG, "UPDATE_POSTING: is this method being called?");
         myDatabaseRef
                 .child(getDate())
                 .child(mKey)
@@ -91,8 +92,8 @@ public class PostRepository {
     }
 
     //gets the posting of key
-    private MutableLiveData<Posting> posting = new MutableLiveData<>();
     public MutableLiveData<Posting> GET_POSTING(@NonNull final String mKey){
+        MutableLiveData<Posting> posting = new MutableLiveData<>();
         myDatabaseRef.child(getDate())
         .child(mKey)
         .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -115,15 +116,9 @@ public class PostRepository {
         StorageReference ref = mStorageRef.child(mStoragePathReference);
         try {
             final File localFile = File.createTempFile("images", "jpg");
-            ref.getFile(localFile).addOnSuccessListener(new OnSuccessListener< FileDownloadTask.TaskSnapshot >() {
-                @Override
-                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                    mBitmap.postValue(BitmapFactory.decodeFile(localFile.getAbsolutePath()));
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                }
+            ref.getFile(localFile).addOnSuccessListener(taskSnapshot ->
+                    mBitmap.postValue(BitmapFactory.decodeFile(localFile.getAbsolutePath())))
+                    .addOnFailureListener(e -> {
             });
         } catch (IOException e) {
             e.printStackTrace();
@@ -139,18 +134,8 @@ public class PostRepository {
 
         StorageReference imgRef = mStorageRef.child(mStoragePathReference);
         imgRef.putFile(mUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Log.d(TAG, "onSuccess: successfully uploaded new posting image");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        Log.d(TAG, "onFailure: unable to upload new posting image");
-                    }
-                });
+                .addOnSuccessListener(taskSnapshot -> Log.d(TAG, "onSuccess: successfully uploaded new posting image"))
+                .addOnFailureListener(exception -> Log.d(TAG, "onFailure: unable to upload new posting image"));
         return mStoragePathReference;
     }
 

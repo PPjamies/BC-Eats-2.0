@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 
 public class ListingsFragment extends Fragment {
     private final static String TAG = "ListingsFragment";
-    private static final String phoneNumber = "5555555555";
+    private static final String phoneNumber = "+14255778832";
     private Context mContext;
 
     //view model
@@ -38,12 +39,7 @@ public class ListingsFragment extends Fragment {
     private TextView mDateText;
 
     private void loadTextFromViewModel(){
-        mListingsViewModel.getDateText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                mDateText.setText(s);
-            }
-        });
+        mListingsViewModel.getDateText().observe(getViewLifecycleOwner(), s -> mDateText.setText(s));
     }
 
 
@@ -55,28 +51,23 @@ public class ListingsFragment extends Fragment {
         mHasNoPostTextView = (TextView)root.findViewById(R.id.listings_no_posts_text);
         mDateText = (TextView)root.findViewById(R.id.listings_date_text);
 
+
         //initialize view model
         mListingsViewModel = ViewModelProviders.of(this).get(ListingsViewModel.class);
         loadTextFromViewModel();
-        mListingsViewModel.hasPosts(phoneNumber).observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                if(aBoolean){
-                    mHasNoPostTextView.setVisibility(TextView.GONE);
-                }else{
-                    mHasNoPostTextView.setVisibility(TextView.VISIBLE);
-                }
+        mListingsViewModel.hasPosts(phoneNumber).observe(getViewLifecycleOwner(), aBoolean -> {
+            if(aBoolean){
+                mHasNoPostTextView.setVisibility(TextView.GONE);
+            }else{
+                mHasNoPostTextView.setVisibility(TextView.VISIBLE);
             }
         });
 
         mList = new ArrayList<>();
-        mListingsViewModel.getListings(phoneNumber).observe(getViewLifecycleOwner(), new Observer<ArrayList<Posting>>() {
-            @Override
-            public void onChanged(ArrayList<Posting> postings) {
-                mList = postings;
-                mAdapter = new Adapter(mContext,mList);
-                mRecyclerView.setAdapter(mAdapter);
-            }
+        mListingsViewModel.getListings(phoneNumber).observe(getViewLifecycleOwner(), postings -> {
+            mList = postings;
+            mAdapter = new Adapter(getActivity(),mList);
+            mRecyclerView.setAdapter(mAdapter);
         });
 
 
