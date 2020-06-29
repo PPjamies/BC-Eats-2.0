@@ -2,6 +2,7 @@ package com.example.bceats20.pj_login.authentication;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -54,6 +55,10 @@ public class PhoneAuthActivity extends AppCompatActivity{
     private EditText mEditText;
     private Button mButtonSignIn;
 
+    //SharedPreferences system saving
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +94,8 @@ public class PhoneAuthActivity extends AppCompatActivity{
         mProgressBar = (ProgressBar) findViewById(R.id.progressbar);
         mEditText = (EditText) findViewById(R.id.editTextCode);
         mButtonSignIn = (Button)findViewById(R.id.buttonSignIn);
+        sharedPreferences = this.getSharedPreferences("user", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
     }
 
 /* Restores instance states to resume the phone number sign in process if your app closes before the user can sign in*/
@@ -213,9 +220,15 @@ public class PhoneAuthActivity extends AppCompatActivity{
         // [END retrieve_current_token]
 
 
-        //Save user phone number to shared repo
+        //Save user phone number to sharedpreferences so other activities can use it
+        Log.d(TAG, "startMain: phonenumber"+mPhone);
+        editor.putString(getString(R.string.shared_preferences_file_name), mPhone);
+        editor.commit();
+
+        Log.d(TAG, "startMain: saved in shared pref"+sharedPreferences.getString(getString(R.string.shared_preferences_file_name),null));
 
         Intent intent = new Intent(PhoneAuthActivity.this, MainActivity.class);
+        intent.putExtra("phonenumber",mPhone);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }

@@ -3,6 +3,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,13 +19,24 @@ public class LoginActivity extends AppCompatActivity{
     private EditText mPhoneNumber_EditText;
     private Button mLoginButton;
 
+    //SharedPreferences saved data
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pj_activity_login);
         mContext = this;
+        initSharedPrefernces();
+
         initGetPhoneEditText();
         initSignInButtons();
+    }
+
+    private void initSharedPrefernces() {
+        sharedPreferences = this.getSharedPreferences("user", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
     }
 
     private void initGetPhoneEditText(){
@@ -43,6 +55,7 @@ public class LoginActivity extends AppCompatActivity{
             }
             else
             {
+                editor.putString(getString(R.string.shared_preferences_file_name), phone);
                 Intent intent = new Intent(mContext, PhoneAuthActivity.class);
                 intent.putExtra("mPhone", phone);
                 startActivity(intent);

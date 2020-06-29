@@ -26,8 +26,14 @@
         <activity android:name=".post.EditPostActivity"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".pj_login.authentication.PhoneAuthActivity"
+            android:parentActivityName=".pj_login.LoginActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".MainActivity"
+            android:parentActivityName=".pj_login.authentication.PhoneAuthActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
-            android:name=".MainActivity"
+            android:name=".pj_login.LoginActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>

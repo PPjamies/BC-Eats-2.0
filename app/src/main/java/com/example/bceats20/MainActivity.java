@@ -1,7 +1,10 @@
 package com.example.bceats20;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 
@@ -21,12 +24,29 @@ import androidx.appcompat.widget.Toolbar;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static String TAG = "MainActivity";
+
     private AppBarConfiguration mAppBarConfiguration;
+
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //SharedPreferences for saving/loading data between activities
+        sharedPreferences = this.getSharedPreferences(getString(R.string.shared_preferences_file_name), Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
+        Intent intent = getIntent();
+        String phone = intent.getStringExtra("phonenumber");
+
+        editor.putString(getString(R.string.shared_preferences_file_name),phone);
+        editor.commit();
+        Log.d(TAG, "onCreate: editor.putString done");
+        Log.d(TAG, "onCreate: Did I put it in?"+sharedPreferences.getString(getString(R.string.shared_preferences_file_name),"butts"));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

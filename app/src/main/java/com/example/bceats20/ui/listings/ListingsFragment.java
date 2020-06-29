@@ -22,6 +22,8 @@ import java.util.ArrayList;
 
 public class ListingsFragment extends Fragment {
     private final static String TAG = "ListingsFragment";
+    //TODO: Get rid of hard coded phone number and pull from SharedPreferences
+
     private static final String phoneNumber = "+14255778832";
     private Context mContext;
 

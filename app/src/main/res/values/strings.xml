@@ -2,6 +2,9 @@
     <!--app name-->
     <string name="app_name">BC Eats 2.0</string>
 
+    <!--SharedPreferences File Name-->
+    <string name="shared_preferences_file_name">BCEatsUserInfo</string>
+
     <!--Login-->
     <string name="welcome_txt">Welcome to BC Eats 2.0</string>
     <string name="title_activity_login">Sign in</string>

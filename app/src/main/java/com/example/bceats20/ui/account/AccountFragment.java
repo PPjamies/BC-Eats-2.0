@@ -1,6 +1,7 @@
 package com.example.bceats20.ui.account;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -52,6 +53,8 @@ public class AccountFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_account, container, false);
         mContext = getActivity().getApplicationContext();
+
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(getString(R.string.shared_preferences_file_name),Context.MODE_PRIVATE);
 
         //Initialize widgets
         mEditButton = (ImageButton) root.findViewById(R.id.edit_phone_btn_account);
