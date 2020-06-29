@@ -41,4 +41,8 @@ public class AuthViewModel extends AndroidViewModel {
         }
         createdUserLiveData = authRepository.createUserInFirebaseIfNotExists(authenticatedUser);
     }
+
+    public void saveToken(String token, String phone){
+        authRepository.saveToken(token, phone);
+    }
 }

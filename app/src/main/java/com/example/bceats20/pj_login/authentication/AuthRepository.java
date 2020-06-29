@@ -17,14 +17,14 @@ public class AuthRepository {
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabaseRef;
 
-    public AuthRepository(){
+    public AuthRepository() {
         mAuth = FirebaseAuth.getInstance();
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
     }
 
     MutableLiveData<User> firebaseSignInWithPhoneCredential(PhoneAuthCredential credential, @NonNull String phone) {
         MutableLiveData<User> authenticatedUserMutableLiveData = new MutableLiveData<>();
-        mAuth.signInWithCredential(credential).addOnCompleteListener(authTask ->{
+        mAuth.signInWithCredential(credential).addOnCompleteListener(authTask -> {
             if (authTask.isSuccessful()) {
                 boolean isNewUser = authTask.getResult().getAdditionalUserInfo().isNewUser();
 
@@ -54,4 +54,17 @@ public class AuthRepository {
         newUserMutableLiveData.setValue(authenticatedUser);
         return newUserMutableLiveData;
     }
+
+    public void saveToken(@NonNull String token, @NonNull String phone) {
+        User temp = new User();
+        temp.setPhone(phone);
+        temp.isNewUser = false;
+        temp.setPushToken(token);
+
+        mDatabaseRef
+                .child("users")
+                .child(phone)
+                .setValue(temp);
+    }
+
 }

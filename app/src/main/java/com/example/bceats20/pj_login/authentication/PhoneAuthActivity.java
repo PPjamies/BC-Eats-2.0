@@ -199,24 +199,27 @@ public class PhoneAuthActivity extends AppCompatActivity{
 
 
     protected void startMain(){
-        // [START retrieve_current_token] not sure wth this is for
-//        FirebaseInstanceId.getInstance().getInstanceId()
-//                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
-//                        if (!task.isSuccessful()) {
-//                            Log.w(TAG, "getInstanceId failed", task.getException());
-//                            return;
-//                        }
-//
-//                        // Get new Instance ID token
-//                        String token = task.getResult().getToken();
-//
-//                        // Log and toast
-//                        Log.d(TAG, "Token: " + token );
-//                        Toast.makeText(PhoneAuthActivity.this, "Token: " + token, Toast.LENGTH_SHORT).show();
-//                    }
-//                });
+        // [START retrieve_current_token]
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "getInstanceId failed", task.getException());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+
+                        // Log and toast
+                        Log.d(TAG, "Token: " + token );
+                        Toast.makeText(PhoneAuthActivity.this, "Token: " + token, Toast.LENGTH_SHORT).show();
+
+                        //save push token into db
+                        mAuthViewModel.saveToken(token, mPhone);
+                    }
+                });
         // [END retrieve_current_token]
 
 
