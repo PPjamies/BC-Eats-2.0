@@ -1,6 +1,7 @@
 package com.example.bceats20.service;
 
 import android.app.Application;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -9,7 +10,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.bceats20.R;
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -17,6 +17,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMsgService";
@@ -26,18 +27,25 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
         Log.d(TAG, "Refreshed token: " + token);
-        sendNotification(token);
+        //displayNotification(token);
     }
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        if (remoteMessage.getNotification() != null) {
-            Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-        }
-        sendNotification(remoteMessage.getNotification().getBody());
+        //Log.d(TAG, "onMessageReceived: message-body: " + remoteMessage.getNotification().getBody());
+        //displayNotification(remoteMessage);
+        Log.d(TAG, "onMessageReceived: remote message data payload: " + remoteMessage.getData());
+        super.onMessageReceived(remoteMessage);
+        Notification notification = new NotificationCompat.Builder(this)
+                .setContentTitle(remoteMessage.getData().get("title"))
+                .setContentText(remoteMessage.getData().get("body"))
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .build();
+        NotificationManagerCompat manager = NotificationManagerCompat.from(getApplicationContext());
+        manager.notify(123, notification);
     }
 
-    private void sendNotification(String messageBody) {
+    private void displayNotification(RemoteMessage remoteMessage) {
         Intent intent = new Intent(this, Application.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
@@ -47,8 +55,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, "BC-Eats")
                         .setSmallIcon(R.drawable.ic_notifications_none)
-                        .setContentTitle("Notification from BC Eats")
-                        .setContentText(messageBody)
+                        .setContentTitle(remoteMessage.getNotification().getTitle())
+                        .setContentText(remoteMessage.getNotification().getBody())
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
                         .setContentIntent(pendingIntent);
