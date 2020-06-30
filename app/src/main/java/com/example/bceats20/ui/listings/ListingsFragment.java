@@ -1,6 +1,7 @@
 package com.example.bceats20.ui.listings;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +25,7 @@ public class ListingsFragment extends Fragment {
     private final static String TAG = "ListingsFragment";
     //TODO: Get rid of hard coded phone number and pull from SharedPreferences
 
-    private static final String phoneNumber = "+14255778832";
+    private  String phoneNumber;
     private Context mContext;
 
     //view model
@@ -53,6 +54,9 @@ public class ListingsFragment extends Fragment {
         mHasNoPostTextView = (TextView)root.findViewById(R.id.listings_no_posts_text);
         mDateText = (TextView)root.findViewById(R.id.listings_date_text);
 
+        //Get phone number
+        SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(getString(R.string.shared_preferences_file_name),Context.MODE_PRIVATE);
+        phoneNumber = sharedPreferences.getString(getString(R.string.shared_preferences_file_name),null);
 
         //initialize view model
         mListingsViewModel = ViewModelProviders.of(this).get(ListingsViewModel.class);
