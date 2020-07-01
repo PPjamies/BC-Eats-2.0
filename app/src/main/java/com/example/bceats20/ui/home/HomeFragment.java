@@ -134,6 +134,7 @@ public class HomeFragment extends Fragment {
 
         //match current date with a branch in database
         query = FirebaseDatabase.getInstance().getReference()
+                .child("posts")
                 .child(date);
 
         FirebaseRecyclerOptions<Posting> options =

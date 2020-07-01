@@ -79,6 +79,7 @@ public class AccountRepository {
 
         //update listings with new phone
         myDatabaseRef
+                .child("posts")
                 .child(getDate())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

@@ -53,6 +53,7 @@ public class PostRepository {
     public MutableLiveData<Boolean> HAS_ACTIVE_POSTINGS(){
         isTrue.setValue(true);
         myDatabaseRef
+                .child("posts")
                 .child(getDate())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -76,6 +77,7 @@ public class PostRepository {
         String mImageKey = myDatabaseRef.child(getDate()).push().getKey(); //generate new key
         posting.setImageKey(mImageKey); //store key into posting object
         myDatabaseRef
+                .child("posts")
                 .child(getDate())
                 .child(mImageKey)
                 .setValue(posting); //save object to database
@@ -86,6 +88,7 @@ public class PostRepository {
     public void UPDATE_POSTING(final Posting mUpdatedPosting, @NonNull final String mKey) {
         Log.d(TAG, "UPDATE_POSTING: is this method being called?");
         myDatabaseRef
+                .child("posts")
                 .child(getDate())
                 .child(mKey)
                 .setValue(mUpdatedPosting);
@@ -94,18 +97,20 @@ public class PostRepository {
     //gets the posting of key
     public MutableLiveData<Posting> GET_POSTING(@NonNull final String mKey){
         MutableLiveData<Posting> posting = new MutableLiveData<>();
-        myDatabaseRef.child(getDate())
-        .child(mKey)
-        .addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                posting.postValue(dataSnapshot.getValue(Posting.class));
-            }
+        myDatabaseRef
+                .child("posts")
+                .child(getDate())
+                .child(mKey)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        posting.postValue(dataSnapshot.getValue(Posting.class));
+                    }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
         return posting;
     }
 

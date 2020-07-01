@@ -43,6 +43,7 @@ public class ListingsRepository {
     public MutableLiveData<Boolean> USER_HAS_ACTIVE_POSTINGS(@NonNull final String phoneNumber){
         isTrue.setValue(false);
         myDatabaseRef
+                .child("posts")
                 .child(getDate())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -66,6 +67,7 @@ public class ListingsRepository {
     private MutableLiveData<ArrayList<Posting>> mListOfPostings = new MutableLiveData<>();
     public MutableLiveData<ArrayList<Posting>> GET_USER_ACTIVE_POSTINGS(@NonNull final String phoneNumber){
         myDatabaseRef
+                .child("posts")
                 .child(getDate())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -90,6 +92,7 @@ public class ListingsRepository {
     public void DELETE_POSTING(@NonNull final String key){
         //removes from firebase
         myDatabaseRef
+                .child("posts")
                 .child(getDate())
                 .child(key)
                 .removeValue();
