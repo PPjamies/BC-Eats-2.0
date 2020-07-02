@@ -9,13 +9,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.example.bceats20.MainActivity;
 import com.example.bceats20.R;
-import com.example.bceats20.model.User;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskExecutors;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
@@ -24,13 +20,11 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
 
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 public class PhoneAuthActivity extends AppCompatActivity{
@@ -72,18 +66,15 @@ public class PhoneAuthActivity extends AppCompatActivity{
         initialize();
         startPhoneVerification(mPhone);
 
-        mButtonSignIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String code = mEditText.getText().toString().trim();
+        mButtonSignIn.setOnClickListener(v -> {
+            String code = mEditText.getText().toString().trim();
 
-                if (code.isEmpty() || code.length() < 6) {
-                    mEditText.setError("Enter code...");
-                    mEditText.requestFocus();
-                    return;
-                }
-                verifyPhoneNumberWithCode(code);
+            if (code.isEmpty() || code.length() < 6) {
+                mEditText.setError("Enter code...");
+                mEditText.requestFocus();
+                return;
             }
+            verifyPhoneNumberWithCode(code);
         });
     }
 
@@ -199,36 +190,22 @@ public class PhoneAuthActivity extends AppCompatActivity{
 
 
     protected void startMain(){
-        // [START retrieve_current_token]
         FirebaseInstanceId.getInstance().getInstanceId()
-                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "getInstanceId failed", task.getException());
-                            return;
-                        }
-
-                        // Get new Instance ID token
-                        String token = task.getResult().getToken();
-
-                        // Log and toast
-                        Log.d(TAG, "Token: " + token );
-                        Toast.makeText(PhoneAuthActivity.this, "Token: " + token, Toast.LENGTH_SHORT).show();
-
-                        //save push token into db
-                        mAuthViewModel.saveToken(token, mPhone);
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w(TAG, "getInstanceId failed", task.getException());
+                        return;
                     }
+
+                    // Get new push token and save to db
+                    String token = task.getResult().getToken();
+                    mAuthViewModel.saveToken(token, mPhone);
                 });
-        // [END retrieve_current_token]
 
 
         //Save user phone number to sharedpreferences so other activities can use it
-        Log.d(TAG, "startMain: phonenumber"+mPhone);
         editor.putString(getString(R.string.shared_preferences_file_name), mPhone);
         editor.commit();
-
-        Log.d(TAG, "startMain: saved in shared pref"+sharedPreferences.getString(getString(R.string.shared_preferences_file_name),null));
 
         Intent intent = new Intent(PhoneAuthActivity.this, MainActivity.class);
         intent.putExtra("phonenumber",mPhone);

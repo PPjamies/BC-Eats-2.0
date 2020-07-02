@@ -2,8 +2,8 @@ package com.example.bceats20.post;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -30,11 +30,9 @@ import com.example.bceats20.utils.ImageUtils;
 import java.io.File;
 import java.io.IOException;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
@@ -48,6 +46,9 @@ public class EditPostActivity extends AppCompatActivity implements AdapterView.O
     //view model
     EditPostViewModel mViewModel;
 
+    //shared preference
+    SharedPreferences sharedPreferences;
+
     //widgets
     private Toolbar mToolbar;
     private Spinner mSpinner;
@@ -60,7 +61,6 @@ public class EditPostActivity extends AppCompatActivity implements AdapterView.O
     //Camera/Gallery intent codes
     private static final int CAMERA_REQUEST = 0;
     private static final int GALLERY_REQUEST = 1;
-    private static final int PERMISSIONS_REQUEST = 123;
 
     //Camera/Gallery
     private File captureMediaFile;
@@ -95,6 +95,9 @@ public class EditPostActivity extends AppCompatActivity implements AdapterView.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_post);
         mContext = this;
+
+        //initialize shared prefrences
+        sharedPreferences = getApplication().getSharedPreferences(getApplication().getString(R.string.shared_preferences_file_name), Context.MODE_PRIVATE);
 
         //grab intent object from adapter
         Intent intent = getIntent();
@@ -144,9 +147,7 @@ public class EditPostActivity extends AppCompatActivity implements AdapterView.O
         mSpinner.setSelection(pos);
     }
 
-    public void onNothingSelected(AdapterView<?> parent) {
-        // Another interface callback
-    }
+    public void onNothingSelected(AdapterView<?> parent) { }
     /* EOF spinner */
 
 
@@ -154,21 +155,18 @@ public class EditPostActivity extends AppCompatActivity implements AdapterView.O
     private void selectImageDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setTitle("Upload a Photo!");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Take Photo"))
-                {
-                    cameraIntent();
-                }
-                else if (items[item].equals("Choose from Library"))
-                {
-                    galleryIntent();
-                }
-                else if (items[item].equals("Cancel"))
-                {
-                    dialog.dismiss();
-                }
+        builder.setItems(items, (dialog, item) -> {
+            if (items[item].equals("Take Photo"))
+            {
+                cameraIntent();
+            }
+            else if (items[item].equals("Choose from Library"))
+            {
+                galleryIntent();
+            }
+            else if (items[item].equals("Cancel"))
+            {
+                dialog.dismiss();
             }
         });
         builder.show();
@@ -278,7 +276,7 @@ public class EditPostActivity extends AppCompatActivity implements AdapterView.O
         }else {
             am_pm="AM";
         }
-
+        hour-=12;
         StringBuilder sb = new StringBuilder();
         sb.append(hour).append(":").append(minute).append(" ").append(am_pm);
         return sb.toString();
@@ -303,15 +301,18 @@ public class EditPostActivity extends AppCompatActivity implements AdapterView.O
             mDescription.setError("Add a little description of what's available");
             mDescription.requestFocus();
         }else{
+            //so redundent...cringe --this is so that recycler view adapter can update the arraylist
+            Posting test = new Posting(title,building,room,timeLimit,description,mPosting.getImageKey());
+            String phoneNumber = sharedPreferences.getString(getApplication().getString(R.string.shared_preferences_file_name),null);
+            test.setPhone(phoneNumber);
+
+            //save new posting to db
             mViewModel.setPosting(title,building,room,timeLimit,description);
         }
     }
     /* EOF upload posting */
 
-
-    /*BOF close*/
     public void close(){
         finish();
     }
-    /*EOF close*/
 }

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,17 +12,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.bumptech.glide.util.Util;
-import com.example.bceats20.BuildConfig;
 import com.example.bceats20.utils.ImageUtils;
 import com.example.bceats20.utils.Utility;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.os.Environment;
@@ -42,9 +39,6 @@ import com.example.bceats20.R;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Objects;
 import java.util.UUID;
 
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
@@ -56,6 +50,9 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
 
     //view model
     CreatePostViewModel mViewModel;
+
+    //phone
+    SharedPreferences sharedPreferences;
 
     //widgets
     private Toolbar mToolbar;
@@ -70,7 +67,6 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
     //Camera/Gallery intent codes
     private static final int CAMERA_REQUEST = 0;
     private static final int GALLERY_REQUEST = 1;
-    private static final int PERMISSIONS_REQUEST = 123;
     private String mChoice;
 
     //Camera/Gallery
@@ -81,14 +77,14 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
     //Select Image Dialog
     private static final CharSequence[] items = { "Take Photo", "Choose from Library", "Cancel" };
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
         mContext = this;
+
+        //initialize shared prefrences
+        sharedPreferences = getApplication().getSharedPreferences(getApplication().getString(R.string.shared_preferences_file_name), Context.MODE_PRIVATE);
 
         //initialize widgets
         mTitle = (EditText) findViewById(R.id.post_title_et);
@@ -113,27 +109,12 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
 
         //restore state by loading data from view model
         mViewModel = ViewModelProviders.of(this).get(CreatePostViewModel.class);
-        mViewModel.getBitmap().observe(this, new Observer<Bitmap>() {
-            @Override
-            public void onChanged(@Nullable  Bitmap bitmap) {
-                mImage.setImageBitmap(bitmap);
-            }
-        });
-        mViewModel.getUri().observe(this, new Observer<Uri>() {
-            @Override
-            public void onChanged(Uri uri) {
-                selectedImage = uri;
-            }
-        });
+        mViewModel.getBitmap().observe(this, bitmap -> mImage.setImageBitmap(bitmap));
+        mViewModel.getUri().observe(this, uri -> selectedImage = uri);
 
         //initialize and set floating action button - open camera or gallery
         mFloatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
-        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                selectImageDialog();
-            }
-        });
+        mFloatingActionButton.setOnClickListener(view -> selectImageDialog());
 
         //initialize and set post button
         mPostButton = (Button) findViewById(R.id.post_btn);
@@ -146,12 +127,7 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
 
         //initialize and set cancel button
         mCancelButton = (Button) findViewById(R.id.cancel_btn);
-        mCancelButton.setOnClickListener((new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                close();
-            }
-        }));
+        mCancelButton.setOnClickListener((view -> close()));
     }
 
 
@@ -168,9 +144,6 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
 
 
     /* BOF gallery/camera intent */
-
-
-
      private void selectImageDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setTitle("Upload a Photo!");
@@ -343,6 +316,7 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
             am_pm="AM";
         }
 
+        hour-=12;
         StringBuilder sb = new StringBuilder();
         sb.append(hour).append(":").append(minute).append(" ").append(am_pm);
         return sb.toString();
@@ -363,21 +337,15 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
         }else if(TextUtils.isEmpty(room)) {
             mRoom.setError("enter a room number");
             mRoom.requestFocus();
-        }else if(TextUtils.isEmpty(description)) {
-            mDescription.setError("Add a little description of what's available");
-            mDescription.requestFocus();
         }else{
-            mViewModel.setPosting(title,building,room,timeLimit,description);
+            String phoneNumber = sharedPreferences.getString(getApplication().getString(R.string.shared_preferences_file_name),null);
+            mViewModel.setPosting(title,building,room,timeLimit,description,phoneNumber);
             close();
         }
     }
     /* EOF upload posting */
 
-
-    /*BOF close*/
     public void close(){
-        //closes out of activity
         finish();
     }
-    /*EOF close*/
 }

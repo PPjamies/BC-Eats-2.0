@@ -101,14 +101,9 @@ public class ListingsRepository {
         final String mStoragePathReference = new StringBuilder("images/").append(key).append(".jpg").toString();
         StorageReference imgRef = mStorageRef.child(mStoragePathReference);
         imgRef.delete().addOnSuccessListener(aVoid -> {
-            // File deleted successfully
             Log.d(TAG, "onSuccess: deleted file");
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Uh-oh, an error occurred!
-                Log.d(TAG, "onFailure: did not delete file");
-            }
+        }).addOnFailureListener(exception -> {
+            Log.d(TAG, "onFailure: did not delete file");
         });
     }
 }

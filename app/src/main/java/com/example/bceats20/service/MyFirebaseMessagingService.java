@@ -20,7 +20,6 @@ import androidx.core.app.NotificationCompat;
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMsgService";
 
-    //fires whenever a new token is generated
     @Override
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
@@ -30,8 +29,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
-        Log.d(TAG, "onMessageReceived: remote message data payload: " + remoteMessage.getData());
-
+        //Log.d(TAG, "onMessageReceived: remote message data payload: " + remoteMessage.getData());
         displayNotification(remoteMessage);
     }
 
@@ -64,6 +62,5 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
-
 }
 

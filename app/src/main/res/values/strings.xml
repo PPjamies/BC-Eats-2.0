@@ -4,6 +4,7 @@
 
     <!--SharedPreferences File Name-->
     <string name="shared_preferences_file_name">BCEatsUserInfo</string>
+    <string name="shared_pref_key_updated_posting">UpdatedPosting</string>
 
     <!--Login-->
     <string name="welcome_txt">Welcome to BC Eats 2.0</string>

@@ -1,5 +1,6 @@
 package com.example.bceats20;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
@@ -11,12 +12,15 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 
+import com.example.bceats20.model.Posting;
 import com.example.bceats20.pj_login.authentication.PhoneAuthActivity;
 import com.example.bceats20.post.CreatePostActivity;
+import com.example.bceats20.ui.listings.ListingsFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -48,8 +52,6 @@ public class MainActivity extends AppCompatActivity {
 
         editor.putString(getString(R.string.shared_preferences_file_name),phone);
         editor.commit();
-        Log.d(TAG, "onCreate: editor.putString done");
-        Log.d(TAG, "onCreate: Did I put it in?"+sharedPreferences.getString(getString(R.string.shared_preferences_file_name),"butts"));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

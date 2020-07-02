@@ -1,17 +1,18 @@
 package com.example.bceats20.ui.listings;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,7 +24,6 @@ import java.util.ArrayList;
 
 public class ListingsFragment extends Fragment {
     private final static String TAG = "ListingsFragment";
-    //TODO: Get rid of hard coded phone number and pull from SharedPreferences
 
     private  String phoneNumber;
     private Context mContext;
@@ -71,8 +71,8 @@ public class ListingsFragment extends Fragment {
 
         mList = new ArrayList<>();
         mListingsViewModel.getListings(phoneNumber).observe(getViewLifecycleOwner(), postings -> {
-            mList = postings;
-            mAdapter = new Adapter(getActivity(),mList);
+            mList.addAll(postings);
+            mAdapter = new Adapter(getActivity(), mList);
             mRecyclerView.setAdapter(mAdapter);
         });
 
