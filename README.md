@@ -26,3 +26,5 @@ This version includes following issues:
 phones will recieve a push notification when app is killed.
 -Fake phone numbers are still being saved into database even though they are not authenticated
 by firebase.
+
+Google-Service.json file is deleted from app level, ask admin for the file.
