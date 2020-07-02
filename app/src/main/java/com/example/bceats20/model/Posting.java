@@ -1,12 +1,15 @@
 package com.example.bceats20.model;
 
-public class Posting {
+import java.io.Serializable;
+
+public class Posting implements Serializable {
     private String mTitle;
     private String mBuilding;
     private String mRoom;
     private String mTimeLimit;
     private String mDescription;
     private String mImageKey;
+    private String mPhone;
 
     public Posting(){
         mTitle="";
@@ -15,6 +18,7 @@ public class Posting {
         mTimeLimit="";
         mDescription="";
         mImageKey="";
+        mPhone="";
     }
 
     public Posting(String title, String building, String room, String timeLimit, String description, String imageKey) {
@@ -24,6 +28,14 @@ public class Posting {
         mTimeLimit = timeLimit;
         mDescription = description;
         mImageKey = imageKey;
+    }
+
+    public String getPhone() {
+        return mPhone;
+    }
+
+    public void setPhone(String phone) {
+        mPhone = phone;
     }
 
     public String getTitle() {
@@ -73,5 +85,4 @@ public class Posting {
     public void setImageKey(String imageKey) {
         mImageKey = imageKey;
     }
-
 }

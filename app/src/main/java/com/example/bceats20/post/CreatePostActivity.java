@@ -4,22 +4,24 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.example.bceats20.utility.ImageUtils;
+import com.example.bceats20.utils.ImageUtils;
+import com.example.bceats20.utils.Utility;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
@@ -37,6 +39,7 @@ import com.example.bceats20.R;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
 import static android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
@@ -47,6 +50,9 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
 
     //view model
     CreatePostViewModel mViewModel;
+
+    //phone
+    SharedPreferences sharedPreferences;
 
     //widgets
     private Toolbar mToolbar;
@@ -61,7 +67,7 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
     //Camera/Gallery intent codes
     private static final int CAMERA_REQUEST = 0;
     private static final int GALLERY_REQUEST = 1;
-    private static final int PERMISSIONS_REQUEST = 123;
+    private String mChoice;
 
     //Camera/Gallery
     private File captureMediaFile;
@@ -71,14 +77,14 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
     //Select Image Dialog
     private static final CharSequence[] items = { "Take Photo", "Choose from Library", "Cancel" };
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
         mContext = this;
+
+        //initialize shared prefrences
+        sharedPreferences = getApplication().getSharedPreferences(getApplication().getString(R.string.shared_preferences_file_name), Context.MODE_PRIVATE);
 
         //initialize widgets
         mTitle = (EditText) findViewById(R.id.post_title_et);
@@ -103,27 +109,12 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
 
         //restore state by loading data from view model
         mViewModel = ViewModelProviders.of(this).get(CreatePostViewModel.class);
-        mViewModel.getBitmap().observe(this, new Observer<Bitmap>() {
-            @Override
-            public void onChanged(@Nullable  Bitmap bitmap) {
-                mImage.setImageBitmap(bitmap);
-            }
-        });
-        mViewModel.getUri().observe(this, new Observer<Uri>() {
-            @Override
-            public void onChanged(Uri uri) {
-                selectedImage = uri;
-            }
-        });
+        mViewModel.getBitmap().observe(this, bitmap -> mImage.setImageBitmap(bitmap));
+        mViewModel.getUri().observe(this, uri -> selectedImage = uri);
 
         //initialize and set floating action button - open camera or gallery
         mFloatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
-        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                selectImageDialog();
-            }
-        });
+        mFloatingActionButton.setOnClickListener(view -> selectImageDialog());
 
         //initialize and set post button
         mPostButton = (Button) findViewById(R.id.post_btn);
@@ -136,12 +127,7 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
 
         //initialize and set cancel button
         mCancelButton = (Button) findViewById(R.id.cancel_btn);
-        mCancelButton.setOnClickListener((new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                close();
-            }
-        }));
+        mCancelButton.setOnClickListener((view -> close()));
     }
 
 
@@ -158,23 +144,32 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
 
 
     /* BOF gallery/camera intent */
-    private void selectImageDialog(){
+     private void selectImageDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setTitle("Upload a Photo!");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
+
+                boolean writeResults = Utility.checkWriteExternalStoragePermission(mContext);
+                boolean readResults = Utility.checkReadExternalStoragePermission(mContext);
+
                 if (items[item].equals("Take Photo"))
                 {
-                    cameraIntent();
+                    mChoice = "Take Photo";
+                    if(writeResults && readResults)
+                        cameraIntent();
                 }
                 else if (items[item].equals("Choose from Library"))
                 {
-                    galleryIntent();
+                    mChoice = "Choose from Library";
+                    if(writeResults && readResults)
+                        galleryIntent();
                 }
                 else if (items[item].equals("Cancel"))
                 {
-                    dialog.dismiss();
+                    if(writeResults && readResults)
+                        dialog.dismiss();
                 }
             }
         });
@@ -187,13 +182,14 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
 
             if (captureMediaFile != null) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                intent.putExtra(MediaStore.EXTRA_FINISH_ON_COMPLETION, true);
 
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
                     intent.addFlags(FLAG_GRANT_READ_URI_PERMISSION | FLAG_GRANT_WRITE_URI_PERMISSION);
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, captureMediaFile);
                 } else {
                     Uri photoUri = FileProvider.getUriForFile(mContext, mContext.getPackageName() + ".provider", captureMediaFile);
-                    intent.addFlags(FLAG_GRANT_READ_URI_PERMISSION);
+                    intent.addFlags(FLAG_GRANT_READ_URI_PERMISSION | FLAG_GRANT_WRITE_URI_PERMISSION);
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
                 }
 
@@ -208,11 +204,43 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
         }
 
 
-        private void galleryIntent(){
-            Log.d(TAG, "gallery intent launching");
-            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            startActivityForResult(intent, GALLERY_REQUEST);
+    private void galleryIntent(){
+        Log.d(TAG, "gallery intent launching");
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, GALLERY_REQUEST);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionResult");
+        Boolean write_permissions = false;
+        Boolean read_permissions = false;
+        
+        switch (requestCode) {
+            case Utility.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    write_permissions = true;
+                }
+
+            case Utility.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    read_permissions = true;
+                }
+                break;
         }
+        
+        if(write_permissions && read_permissions){
+            if (mChoice.equals("Take Photo")) {
+                cameraIntent();
+            } else if (mChoice.equals("Choose from Library")) {
+                galleryIntent();
+            }else{
+                //code for deny
+            }
+        }else{
+            Log.d(TAG, "onRequestPermissionsResult: read or write permission was denied");
+        }
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -234,10 +262,14 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), " some_error_while_uploading  ", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "onActivityResult: data is null");
                 }
             } else {
+                Log.d(TAG, "onActivityResult: build version is less that build version with codes N");
                 bitmap = BitmapFactory.decodeFile(captureMediaFile.getAbsolutePath());
                 bytesDocumentsTypePicture = new ImageUtils().getBytesFromBitmap(bitmap);
+                String path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, UUID.randomUUID().toString()+".png", null);
+                mViewModel.setUri(Uri.parse(path));
                 mViewModel.setBitmap(bitmap);
                 mImage.setImageBitmap(bitmap);
             }
@@ -284,6 +316,7 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
             am_pm="AM";
         }
 
+        hour-=12;
         StringBuilder sb = new StringBuilder();
         sb.append(hour).append(":").append(minute).append(" ").append(am_pm);
         return sb.toString();
@@ -304,20 +337,15 @@ public class CreatePostActivity extends AppCompatActivity implements AdapterView
         }else if(TextUtils.isEmpty(room)) {
             mRoom.setError("enter a room number");
             mRoom.requestFocus();
-        }else if(TextUtils.isEmpty(description)) {
-            mDescription.setError("Add a little description of what's available");
-            mDescription.requestFocus();
         }else{
-            mViewModel.setPosting(title,building,room,timeLimit,description);
+            String phoneNumber = sharedPreferences.getString(getApplication().getString(R.string.shared_preferences_file_name),null);
+            mViewModel.setPosting(title,building,room,timeLimit,description,phoneNumber);
             close();
         }
     }
     /* EOF upload posting */
 
-
-    /*BOF close*/
     public void close(){
-        //closes out of activity
+        finish();
     }
-    /*EOF close*/
 }

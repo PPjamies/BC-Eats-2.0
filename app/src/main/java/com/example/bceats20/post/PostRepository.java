@@ -4,14 +4,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.example.bceats20.model.BitmapUriWrapper;
 import com.example.bceats20.model.Posting;
-import com.example.bceats20.utility.ImageUtils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,13 +22,10 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModelProviders;
 
 public class PostRepository {
     private static final String TAG = "Create_Post_Repository";
@@ -60,6 +53,7 @@ public class PostRepository {
     public MutableLiveData<Boolean> HAS_ACTIVE_POSTINGS(){
         isTrue.setValue(true);
         myDatabaseRef
+                .child("posts")
                 .child(getDate())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -83,6 +77,7 @@ public class PostRepository {
         String mImageKey = myDatabaseRef.child(getDate()).push().getKey(); //generate new key
         posting.setImageKey(mImageKey); //store key into posting object
         myDatabaseRef
+                .child("posts")
                 .child(getDate())
                 .child(mImageKey)
                 .setValue(posting); //save object to database
@@ -91,27 +86,31 @@ public class PostRepository {
 
     //overwrites the current listing in the branch
     public void UPDATE_POSTING(final Posting mUpdatedPosting, @NonNull final String mKey) {
+        Log.d(TAG, "UPDATE_POSTING: is this method being called?");
         myDatabaseRef
+                .child("posts")
                 .child(getDate())
                 .child(mKey)
                 .setValue(mUpdatedPosting);
     }
 
     //gets the posting of key
-    private MutableLiveData<Posting> posting = new MutableLiveData<>();
     public MutableLiveData<Posting> GET_POSTING(@NonNull final String mKey){
-        myDatabaseRef.child(getDate())
-        .child(mKey)
-        .addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                posting.postValue(dataSnapshot.getValue(Posting.class));
-            }
+        MutableLiveData<Posting> posting = new MutableLiveData<>();
+        myDatabaseRef
+                .child("posts")
+                .child(getDate())
+                .child(mKey)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        posting.postValue(dataSnapshot.getValue(Posting.class));
+                    }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
         return posting;
     }
 
@@ -122,15 +121,9 @@ public class PostRepository {
         StorageReference ref = mStorageRef.child(mStoragePathReference);
         try {
             final File localFile = File.createTempFile("images", "jpg");
-            ref.getFile(localFile).addOnSuccessListener(new OnSuccessListener< FileDownloadTask.TaskSnapshot >() {
-                @Override
-                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                    mBitmap.postValue(BitmapFactory.decodeFile(localFile.getAbsolutePath()));
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                }
+            ref.getFile(localFile).addOnSuccessListener(taskSnapshot ->
+                    mBitmap.postValue(BitmapFactory.decodeFile(localFile.getAbsolutePath())))
+                    .addOnFailureListener(e -> {
             });
         } catch (IOException e) {
             e.printStackTrace();
@@ -146,18 +139,8 @@ public class PostRepository {
 
         StorageReference imgRef = mStorageRef.child(mStoragePathReference);
         imgRef.putFile(mUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Log.d(TAG, "onSuccess: successfully uploaded new posting image");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        Log.d(TAG, "onFailure: unable to upload new posting image");
-                    }
-                });
+                .addOnSuccessListener(taskSnapshot -> Log.d(TAG, "onSuccess: successfully uploaded new posting image"))
+                .addOnFailureListener(exception -> Log.d(TAG, "onFailure: unable to upload new posting image"));
         return mStoragePathReference;
     }
 

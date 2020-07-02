@@ -2,7 +2,6 @@ package com.example.bceats20.ui.home;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,15 +20,12 @@ import com.example.bceats20.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
-import com.example.bceats20.data.LoginDataSource;
 import com.example.bceats20.glide.GlideApp;
 import com.example.bceats20.model.Posting;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.storage.FirebaseStorage;
@@ -42,10 +38,7 @@ public class HomeFragment extends Fragment {
     private Context mContext;
 
     //firebase database
-    private FirebaseDatabase database;
-    private DatabaseReference myRef;
     private Query query;
-    private List<Posting> mPosts;
 
     //recyclerview
     private RecyclerView mRecyclerView;
@@ -129,12 +122,13 @@ public class HomeFragment extends Fragment {
 
     private void fetch(){
         //get current date
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.US);
         String date = dateFormat.format(new Date());
 
 
         //match current date with a branch in database
         query = FirebaseDatabase.getInstance().getReference()
+                .child("posts")
                 .child(date);
 
         FirebaseRecyclerOptions<Posting> options =
@@ -179,6 +173,7 @@ public class HomeFragment extends Fragment {
                         .into(holder.mImageView);
             }
         };
+        mFirebaseRecyclerAdapter.notifyDataSetChanged();
         mRecyclerView.setAdapter(mFirebaseRecyclerAdapter);
     }
 
